@@ -23,6 +23,9 @@ importers:
       '@sanity/browserslist-config':
         specifier: ^1.0.5
         version: 1.0.5
+      acorn:
+        specifier: ^8.14.0
+        version: 8.14.0
       axios:
         specifier: ^1.7.9
         version: 1.7.9

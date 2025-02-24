@@ -82,12 +82,12 @@ const LogLine = ({ type, args }: LogLineProps) => {
     )
   }
 
-  const handleCopy = () => isJSON && jsonData ? navigator.clipboard.writeText(JSON.stringify(jsonData, null, 2)) : navigator.clipboard.writeText(output)
+  const handleCopy = (jsonStatus: boolean) => jsonStatus ? navigator.clipboard.writeText(JSON.stringify(jsonData, null, 2)) : navigator.clipboard.writeText(output)
 
   return (
     <div className="flex border-t px-2 py-2 gap-2">
       <div className="flex items-center border-r">
-        <Button className="py-0 opacity-30 w-8 h-8" variant='secondary' onClick={handleCopy}>
+        <Button className="py-0 opacity-30 w-8 h-8" variant='secondary' onClick={() => handleCopy(isJSON && jsonData)}>
           <CopyIcon />
         </Button>
         <Dialog>

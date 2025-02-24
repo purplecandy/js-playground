@@ -93,7 +93,7 @@ const html = `
 </html>
 `
 //@ts-ignore
-const Preview = ({ input, attributes, updateAttributes }) => {
+const Preview = ({ input, attributes, updateAttributes, repl }) => {
   const iframe = useRef<HTMLIFrameElement | null>(null)
   const id = useId()
   const [loading, setLoading] = useState(false)
@@ -155,7 +155,7 @@ const Preview = ({ input, attributes, updateAttributes }) => {
 
       setLoading(true)
       console.log('Building ', input)
-      const { output, error } = await esBundle(input, true)
+      const { output, error } = await esBundle(input, repl)
       if (error) {
         setResult([["ERR", error.toString()]])
       } else {

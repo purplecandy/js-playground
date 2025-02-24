@@ -2,6 +2,7 @@ import * as esbuild from "esbuild-wasm";
 
 import { unpkgPathPlugin } from "./plugins/unpkg-path-plugin";
 import { fetchPlugin } from "./plugins/fetch-plugin";
+import { replPlugin } from "./plugins/repl-plugin";
 
 interface BundledResult {
   output: string;
@@ -44,7 +45,7 @@ export const loadEsbuild = async () => {
 
 const esBundle = async (
   input: string,
-  hasTypescript: boolean
+  repl: boolean = true
 ): Promise<BundledResult> => {
   await loadEsbuild();
   try {
@@ -55,7 +56,11 @@ const esBundle = async (
       format: "esm",
       platform: "node",
       write: false,
-      plugins: [unpkgPathPlugin(), fetchPlugin(input)],
+      plugins: [
+        ...(repl ? [replPlugin(input)] : []),
+        unpkgPathPlugin(),
+        fetchPlugin(input),
+      ],
       define: {
         global: "window",
       },

@@ -4,12 +4,13 @@ import {
     ResizablePanelGroup,
 } from "@/components/ui/resizable";
 import MonacoEditor, { Monaco } from "@monaco-editor/react";
-import { PlayIcon, RotateCcwIcon, TrashIcon } from "lucide-react";
-import React, { useRef } from "react";
+import { PlayIcon, RotateCcwIcon, SparklesIcon, TrashIcon } from "lucide-react";
+import React, { useEffect, useRef } from "react";
 import { Button } from "../ui/button";
 import Preview from "./preview";
 
 import localForage from "localforage";
+import { Badge } from "../ui/badge";
 
 
 const fileCache = localForage.createInstance({
@@ -18,7 +19,7 @@ const fileCache = localForage.createInstance({
 
 
 
-const initialCode = `const _ = require('lodash')
+const exampleCode = `const _ = require('lodash')
 const { format } = require('date-fns/format');
 const { addDays} = require('date-fns/addDays');
 
@@ -39,8 +40,9 @@ const numbers = [1, 2, 3, 4, 5];
 const doubledNumbers = _.map(numbers, (number) => number * 2);
 console.log(doubledNumbers);`
 
-const resetCode = `const _ = require('lodash')
-
+const initialCode = `const _ = require('lodash')
+// A JavaScript playground with CDN-loaded NPM support  
+// Uses esbuild-wasm, so ensure your browser supports WASM 
 `
 
 function Editor() {
@@ -49,7 +51,22 @@ function Editor() {
     const [code, setCode] = React.useState<string>(initialCode);
     const [runner, setRunner] = React.useState<any>(initialCode);
 
+    const [replStatus, setReplStatus] = React.useState(true);
+    const [autoStatus, setAutoStatus] = React.useState(true);
+
     const [attributes, setAttributes] = React.useState({});
+
+    useEffect(() => {
+        const handler = setTimeout(() => {
+            if (autoStatus) {
+                setRunner(code);
+            }
+        }, 300); // 300ms debounce
+
+        return () => {
+            clearTimeout(handler);
+        };
+    }, [code, autoStatus]);
 
     function handleEditorWillMount(monaco: {
         languages: {
@@ -74,12 +91,17 @@ function Editor() {
     }
 
     const handleReset = () => {
-        setCode(resetCode);
-        setRunner(resetCode);
+        setCode(initialCode);
+        setRunner(initialCode);
     }
 
     const handleTrash = async () => {
         await fileCache.clear()
+    }
+
+    const handleExample = () => {
+        setCode(exampleCode);
+        setRunner(exampleCode);
     }
 
     return (
@@ -111,25 +133,42 @@ function Editor() {
                 </ResizablePanel>
                 <ResizableHandle withHandle />
                 <ResizablePanel>
-                    <div className="flex  gap-2 items-center px-3 py-2 border-b">
-                        <Button className="w-8 h-8 " title="Execute code" variant="secondary" onClick={handleRun}>
-                            <PlayIcon />
-                        </Button>
-                        <Button className="w-8 h-8 " title="Clear document" variant="secondary" onClick={handleReset}>
-                            <RotateCcwIcon />
-                        </Button>
-                        <Button className="w-8 h-8 " title="Clear cache" variant="secondary" onClick={handleTrash}>
-                            <TrashIcon />
-                        </Button>
+                    <div className="flex items-center justify-between border-b px-3 py-2">
+                        <div className="flex  gap-2 items-center  ">
+
+                            {!autoStatus && < Button className="w-8 h-8 " title="Execute code" variant="secondary" onClick={handleRun}>
+                                <PlayIcon />
+                            </Button>}
+                            <Button className="w-8 h-8 " title="Clear document" variant="secondary" onClick={handleReset}>
+                                <RotateCcwIcon />
+                            </Button>
+                            <Button className="w-8 h-8 " title="Clear cache" variant="secondary" onClick={handleTrash}>
+                                <TrashIcon />
+                            </Button>
+                            <Button className="w-8 h-8 " title="Example" variant="secondary" onClick={handleExample}>
+                                <SparklesIcon />
+                            </Button>
+                        </div>
+                        <div>
+                            <Button className="py-0" title="No more console.log just write" variant="ghost" onClick={() => setReplStatus(!replStatus)}>
+                                REPL <Badge variant={replStatus ? "outline" : "destructive"}>{replStatus ? "ON" : "OFF"}</Badge>
+                            </Button>
+
+                            <Button className="py-0" title="Auto execute or on run" variant="ghost" onClick={() => setAutoStatus(!autoStatus)}>
+                                AUTO <Badge variant={autoStatus ? "outline" : "destructive"}>{autoStatus ? "ON" : "OFF"}</Badge>
+                            </Button>
+
+                        </div>
                     </div>
                     <Preview
                         input={runner}
                         attributes={attributes}
                         updateAttributes={setAttributes}
+                        repl={replStatus}
                     />
                 </ResizablePanel>
             </ResizablePanelGroup>
-        </div>
+        </div >
     );
 }
 
