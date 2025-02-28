@@ -1,4 +1,5 @@
 import { Hook, Unhook } from "console-feed"
+
 import * as crc32 from "crc-32"
 import _ from "lodash"
 import React, { useCallback, useEffect, useId, useRef, useState } from "react"
@@ -92,18 +93,52 @@ const html = `
   </head>
 </html>
 `
-//@ts-ignore
-const Preview = ({ input, attributes, updateAttributes, repl }) => {
+
+interface PreviewProps {
+  input: string;
+  attributes: { result?: string; inputHash?: number };
+  updateAttributes: (attrs: { result: string; inputHash: number }) => void;
+  repl: boolean;
+}
+
+interface Message {
+  method: string
+  data?: any[]
+  timestamp?: string
+}
+
+const Preview: React.FC<PreviewProps> = ({ input, attributes, updateAttributes, repl }) => {
   const iframe = useRef<HTMLIFrameElement | null>(null)
   const id = useId()
   const [loading, setLoading] = useState(false)
-  const [inputHash, setInputHash] = useState()
+  const [inputHash, setInputHash] = useState<number | undefined>()
   const [result, setResult] = useState(
 
     () => (attributes.result && JSON.parse(attributes.result)) || []
   )
 
-  const [logs, setLogs] = useState([])
+  const [, setLogs] = useState<Message[]>([])
+
+  const compile = useCallback(
+    _.debounce(async () => {
+      console.log("Compiling", input)
+      input = input.trim()
+      if (!input) return
+
+      setLoading(true)
+      // console.log('Building ', input)
+      const { output, error } = await esBundle(input, repl)
+      if (error) {
+        setResult([["ERR", error.toString()]])
+      } else {
+        const code = `window.codeRunner = async function () { \n${output}\n }`
+        iframe.current?.contentWindow?.postMessage({ id, code }, "*")
+      }
+      setLoading(false)
+    }, 100),
+    [input]
+  )
+
 
   useEffect(() => {
     const newHash = crc32.str(input)
@@ -111,15 +146,15 @@ const Preview = ({ input, attributes, updateAttributes, repl }) => {
       console.log("skipping recompile")
       return
     }
-    //@ts-ignore
+
     setInputHash(newHash)
     compile()
-  }, [input])
+  }, [input, attributes.inputHash, compile])
 
   useEffect(() => {
     const hookedConsole = Hook(
       window.console,
-      // @ts-ignore
+
       (log) => setLogs((currLogs) => [...currLogs, log]),
       false
     )
@@ -136,7 +171,7 @@ const Preview = ({ input, attributes, updateAttributes, repl }) => {
       inputHash
     })
     console.log("Result updated")
-  }, [result, inputHash])
+  }, [result, inputHash, updateAttributes])
 
   useEffect(() => {
     window.addEventListener("message", (event) => {
@@ -147,26 +182,6 @@ const Preview = ({ input, attributes, updateAttributes, repl }) => {
     })
   }, [])
 
-  const compile = useCallback(
-    _.debounce(async () => {
-      console.log("Compiling", input)
-      input = input.trim()
-      if (!input) return
-
-      setLoading(true)
-      console.log('Building ', input)
-      const { output, error } = await esBundle(input, repl)
-      if (error) {
-        setResult([["ERR", error.toString()]])
-      } else {
-        const code = `window.codeRunner = async function () { \n${output}\n }`
-        //@ts-ignore
-        iframe.current?.contentWindow?.postMessage({ id, code }, "*")
-      }
-      setLoading(false)
-    }, 100),
-    [input]
-  )
 
   return (
     <div className="">
@@ -180,8 +195,7 @@ const Preview = ({ input, attributes, updateAttributes, repl }) => {
       {loading ? (
         <div className="px-3 py-2 text-sm text-gray-500">Loading</div>
       ) : (
-        //@ts-ignore
-        result?.map(([type, ...args], i) => (
+        result?.map(([type, ...args]: [string, ...any[]], i: number) => (
           <LogLine key={i} type={type} args={args} />
         ))
       )}

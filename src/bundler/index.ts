@@ -72,8 +72,8 @@ const esBundle = async (
   } catch (error) {
     return {
       output: "",
-      //@ts-ignore
-      error: error.message,
+      error:
+        error instanceof Error ? error.message : "An unknown error occurred",
     };
   }
 };

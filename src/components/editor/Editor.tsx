@@ -11,6 +11,7 @@ import Preview from "./preview";
 
 import localForage from "localforage";
 import { Badge } from "../ui/badge";
+import { editor } from "monaco-editor";
 
 
 const fileCache = localForage.createInstance({
@@ -43,13 +44,15 @@ console.log(doubledNumbers);`
 const initialCode = `const _ = require('lodash')
 // A JavaScript playground with CDN-loaded NPM support  
 // Uses esbuild-wasm, so ensure your browser supports WASM 
+
+// If you see any random syntax error just disable REPL mode that might fix it
 `
 
 function Editor() {
     const monacoRef = useRef<Monaco | null>(null);
 
     const [code, setCode] = React.useState<string>(initialCode);
-    const [runner, setRunner] = React.useState<any>(initialCode);
+    const [runner, setRunner] = React.useState<string>(initialCode);
 
     const [replStatus, setReplStatus] = React.useState(true);
     const [autoStatus, setAutoStatus] = React.useState(true);
@@ -80,9 +83,7 @@ function Editor() {
         monaco.languages.typescript.javascriptDefaults.setEagerModelSync(true);
     }
 
-    function handleEditorDidMount(editor: any, monaco: Monaco) {
-        // here is another way to get monaco instance
-        // you can also store it in `useRef` for further usage
+    function handleEditorDidMount(_editor: editor.IStandaloneCodeEditor, monaco: Monaco) {
         monacoRef.current = monaco;
     }
 

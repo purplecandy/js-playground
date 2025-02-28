@@ -32,7 +32,7 @@ const isSmallObject = (obj = {}, keyLimit = 10, depthLimit = 2) => {
   return totalKeys <= keyLimit && depth <= depthLimit;
 };
 
-const getDepth = (obj: {}): number => {
+const getDepth = (obj: object): number => {
   if (!_.isObject(obj)) return 0;
   return 1 + Math.max(0, ..._.values(obj).map(getDepth));
 };
@@ -58,6 +58,7 @@ const LogLine = ({ type, args }: LogLineProps) => {
         jsonData = JSON.parse(args.join(" "))
         isJSON = true
       } catch (error) {
+        console.error(error)
         isJSON = false
         jsonData = null
       }
@@ -68,7 +69,7 @@ const LogLine = ({ type, args }: LogLineProps) => {
       break
   }
 
-  let output: any = args.join(" ")
+  let output: string | React.ReactNode = args.join(" ")
   if (type === "HTML") {
     output = <div dangerouslySetInnerHTML={{ __html: output }} />
   }
@@ -82,7 +83,7 @@ const LogLine = ({ type, args }: LogLineProps) => {
     )
   }
 
-  const handleCopy = (jsonStatus: boolean) => jsonStatus ? navigator.clipboard.writeText(JSON.stringify(jsonData, null, 2)) : navigator.clipboard.writeText(output)
+  const handleCopy = (jsonStatus: boolean) => jsonStatus ? navigator.clipboard.writeText(JSON.stringify(jsonData, null, 2)) : navigator.clipboard.writeText(output as string)
 
   return (
     <div className="flex border-t px-2 py-2 gap-2">
@@ -101,7 +102,7 @@ const LogLine = ({ type, args }: LogLineProps) => {
 
             </DialogTitle>
             <div className="container w-full">
-              {(isJSON && jsonData) ? <JsonInspector data={jsonData} search={SearchInput} isExpanded={(keypath, value) => isSmallObject(value as Object, 100, 2)} />
+              {(isJSON && jsonData) ? <JsonInspector data={jsonData} search={SearchInput} isExpanded={(_keypath, value) => isSmallObject(value as object, 100, 2)} />
                 : <pre className="max-h-[500px] overflow-auto break-all whitespace-pre-wrap p-4rounded-lg">
                   {output}
                 </pre>
@@ -113,6 +114,7 @@ const LogLine = ({ type, args }: LogLineProps) => {
         </Dialog>
       </div>
       <div className="font-mono text-sm flex items-center gap-2 container max-h-40">
+        {icon}
         <pre>
           {output}
         </pre>

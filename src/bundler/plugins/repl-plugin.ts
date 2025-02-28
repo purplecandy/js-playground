@@ -17,7 +17,7 @@ function isExpression(code: string) {
         expr.type === "CallExpression" &&
         expr.callee.type === "MemberExpression"
       ) {
-        const { object, property } = expr.callee;
+        const { object } = expr.callee;
         if (object.type === "Identifier" && object.name === "console")
           return false;
       }
@@ -26,6 +26,7 @@ function isExpression(code: string) {
 
     return false;
   } catch (e) {
+    console.error(e);
     return false; // Invalid code or syntax errors
   }
 }
@@ -44,10 +45,8 @@ export const replPlugin = (input: string) => {
   return {
     name: "repl-transform",
     setup(build: esbuild.PluginBuild) {
-      build.onLoad({ filter: /(^input\.ts$)/ }, async (args) => {
+      build.onLoad({ filter: /(^input\.ts$)/ }, async () => {
         // Process code input (comes from stdin in esbuild-wasm)
-        const source = args.pluginData?.code || "";
-
         // Transform REPL-like input
         const transformedCode = transformCode(input);
 
