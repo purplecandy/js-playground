@@ -4,9 +4,9 @@
 
 A lightweight and fast JavaScript playground for prototyping code snippets and experimenting with libraries—right in your browser.
 
-Demo:
+[Try the online Play Ground](https://js.kibibyte.in/)
 
-https://github.com/purplecandy/js-playground/raw/refs/heads/main/js-playground-demo.mp4
+![demo gif](https://res.cloudinary.com/kibibyte/image/upload/v1740757109/ezgif-11c57226ddfd07_mu05uw.gif)
 
 ## 🎉 Features
 
