@@ -31,10 +31,11 @@ export const loadEsbuild = async () => {
   isLoading = true;
 
   try {
-    console.log("Intializing esbuild");
+    console.log("Initializing esbuild");
     await esbuild.initialize({
       worker: true,
-      wasmURL: "./node_modules/esbuild-wasm/esbuild.wasm",
+      // 0.25.0 at the time of writing
+      wasmURL: "https://unpkg.com/esbuild-wasm@0.25.0/esbuild.wasm",
     });
     loaded = true;
   } catch (error) {

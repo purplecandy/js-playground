@@ -3,7 +3,10 @@
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/purplecandy/js-playground/blob/main/LICENSE)
 
 A lightweight and fast JavaScript playground for prototyping code snippets and experimenting with libraries—right in your browser.
-<video controls src="js-playground-demo.mp4" title="JS Playground Demo"></video>
+
+[Try the online Play Ground](https://js.kibibyte.in/)
+
+![demo gif](https://res.cloudinary.com/kibibyte/image/upload/v1740757109/ezgif-11c57226ddfd07_mu05uw.gif)
 
 ## 🎉 Features
 
