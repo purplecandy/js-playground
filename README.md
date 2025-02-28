@@ -3,6 +3,7 @@
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/purplecandy/js-playground/blob/main/LICENSE)
 
 A lightweight and fast JavaScript playground for prototyping code snippets and experimenting with libraries—right in your browser.
+<video controls src="js-playground-demo.mp4" title="JS Playground Demo"></video>
 
 ## 🎉 Features
 
@@ -10,6 +11,7 @@ A lightweight and fast JavaScript playground for prototyping code snippets and e
 - **📦 NPM Library Support** – Import and use libraries from NPM seamlessly.
 - **📝 Monaco Editor** – Enjoy coding with the powerful Monaco editor.
 - **⚡ WASM-Powered** – Runs entirely in your browser using WebAssembly—no remote containers, just speed.
+- **📊 Better JSON Viewer** – Inspect data with ease.
 
 ## ⚙️ Prerequisites
 
